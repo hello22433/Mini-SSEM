@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  # 1. RDBMS (MySQL) - "관계형 데이터베이스 설계 경험"
+  # H2 대신 실제 운영 환경과 동일한 MySQL 8.0을 띄웁니다.
+  mysql:
+    image: mysql:8.0
+    container_name: ssem-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: minissem
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
