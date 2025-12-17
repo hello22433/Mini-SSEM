@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: Mini-SSEM
+
+  datasource:
+    # H2 사용 시 MySQL 문법 사용
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    show-sql: true
+    # 핵심 : ddl-auto를 'update'나 'create'가 아닌 'validate'로 변경
+    # 이제 JPA는 DB 구조가 Entity와 맞는지 검사만 하고, 직접 바꾸진 않는다.
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        # 로그에 sql문을 예쁘게 보여줌
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: false # true 라면 기존 DB가 있어도 마이그레이션 실행
+
+  rabbitmq:
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-retries: 3
+          initial-interval: 1000ms
+        default-requeue-rejected: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # 모든 모니터링 엔드포인트를 노출 (실무에선 필요한 것만 열어야 함)
+        include: health, metrics, prometheus
+  endpoint:
+    health:
+      show-details: always # 상세 상태 정보(DB, Disk, RabbitMQ 연결 등) 표시
