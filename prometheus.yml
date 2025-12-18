@@ -6,3 +6,4 @@ scrape_configs:
     metrics_path: '/actuator/prometheus' # Spring Boot Prometheus 엔드포인트
     static_configs:
       - targets: ['localhost:8080'] # Spring Boot 앱 주소
+      # 도커 컨테이너에서 로컬 호스트(스프링앱) 바라보기 / 리눅스 환경에서는 ip로 직접 설정

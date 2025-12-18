@@ -12,4 +12,66 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
-      - "3306:3306"
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ssem-network
+
+  # 2. Message Qeueu (RabbitMQ) - "대규모 트래픽 처리"
+  # Management Plugin이 포함된 이미지를 사용하여 웹 UI(15672)를 제공
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: ssem-rabbitmq
+    ports:
+      - "5672:5672" # 애플리케이션 연결용
+      - "15672:15672" # 관리자 UI (http://localhost:15672)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - ssem-network
+
+  # 3. Cache (Redis) - "고도화: DB 부하 분산"
+  # 조회 성능 최적화를 위한 인메모리 DB
+  redis:
+    image: redis:alpine
+    container_name: ssem-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - ssem-network
+
+  # 4. Monitoring (Prometheus) - "서비스 데이터 모니터링"
+  # Spring Actuator의 데이터를 수집(Scraping)
+  prometheus:
+    image: prom/prometheus
+    container_name: ssem-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml # 설정 파일 마운트
+    networks:
+      - ssem-network
+
+  # 5. Dashboard (Grafana) - "서비스 데이터 모니터링"
+  # 수집된 데이터를 시각화합니다.
+  grafana:
+    image: grafana/grafana
+    container_name: ssem-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - ssem-network
+
+volumes:
+  mysql-data:
+
+networks:
+  ssem-network:
+    driver: bridge

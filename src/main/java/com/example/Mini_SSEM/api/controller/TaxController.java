@@ -4,6 +4,7 @@ import com.example.Mini_SSEM.domain.model.TaxRecord;
 import com.example.Mini_SSEM.domain.model.TaxRequest;
 import com.example.Mini_SSEM.domain.model.TaxResponse;
 import com.example.Mini_SSEM.domain.repository.TaxRecordRepository;
+import com.example.Mini_SSEM.domain.service.TaxService;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
@@ -25,7 +26,8 @@ import java.util.UUID;
 public class TaxController {
 
     private final RabbitTemplate rabbitTemplate;
-    private final TaxRecordRepository repository;
+    private final TaxRecordRepository taxRepository; // 쓰기용
+    private final TaxService taxService; // 읽기용
 
     // 문지기 설정 (Rate Limiter)
     // 용량(Capacity): 10개 (한 번에 최대로 처리 가능한 버스트 용량)
@@ -43,15 +45,17 @@ public class TaxController {
 //        // 🛑 입장권 검사: 토큰 1개 소모 시도
 //        if (bucket.tryConsume(1)) {
             // [성공] 입장권 있음 -> 정상 처리
-            String requestId = UUID.randomUUID().toString();
-            log.info("요청 접수 성공: {}", requestId);
-
-            // A. DB에 '접수(PENDING)' 상태로 우선 저장 (이력 남기기)
-            repository.save(new TaxRecord(requestId, request.getIncome(), request.getYear()));
-
-            // B. RabbitMQ 큐로 메시지 전송 (비동기 처리)
-            // Exchange 이름: "tax-exchange", RoutingKey: "tax.calculate"
-            rabbitTemplate.convertAndSend("tax-exchange", "tax.calculate", requestId);
+//            String requestId = UUID.randomUUID().toString();
+//            log.info("요청 접수 성공: {}", requestId);
+//
+//            // A. DB에 '접수(PENDING)' 상태로 우선 저장 (이력 남기기)
+//            taxRepository.save(new TaxRecord(requestId, request.getIncome(), request.getYear()));
+//
+//            // B. RabbitMQ 큐로 메시지 전송 (비동기 처리)
+//            // Exchange 이름: "tax-exchange", RoutingKey: "tax.calculate"
+//            rabbitTemplate.convertAndSend("tax-exchange", "tax.calculate", requestId);
+//
+            String requestId = taxService.submitTaxCalculation(request);
 
             // C. 사용자에겐 "접수되었습니다" 라고 즉시 응답
             return ResponseEntity.ok(
@@ -78,9 +82,9 @@ public class TaxController {
     }
 
     // 2. 결과 조회 (Polling용)
+    // 수정 : repository.findById(...) -> taxService.getTaxRecord(...) -> 캐싱 적용됨
     @GetMapping("{requestId}")
     public TaxRecord getResult(@PathVariable String requestId) {
-        return repository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("없는 요청입니다."));
+        return taxService.getTaxRecord(requestId);
     }
 }

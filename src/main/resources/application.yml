@@ -2,17 +2,29 @@ spring:
   application:
     name: Mini-SSEM
 
-  datasource:
+#  datasource:
     # H2 사용 시 MySQL 문법 사용
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
+#    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password: ""
 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-console
+
+  # MySQL 연결
+  datasource:
+    url: jdbc:mysql://localhost:3307/minissem?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: localhost
+      port: 6380
 
   jpa:
     show-sql: true
@@ -36,8 +48,13 @@ spring:
           enabled: true
           max-retries: 3
           initial-interval: 1000ms
-        default-requeue-rejected: false
+        default-requeue-rejected: false # dlq에 보관하기 위함
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
+# Actuator 설정 (Prometheus 활성화)
 management:
   endpoints:
     web:
@@ -47,3 +64,7 @@ management:
   endpoint:
     health:
       show-details: always # 상세 상태 정보(DB, Disk, RabbitMQ 연결 등) 표시
+  prometheus:
+    metrics:
+      export:
+        enabled: true
