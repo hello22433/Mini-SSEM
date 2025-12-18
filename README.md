@@ -38,7 +38,7 @@
 * **Solution:**
     * **`HandlerInterceptor` + `Bucket4j` 적용:** 컨트롤러 진입 전 인터셉터 단계에서 **Token Bucket 알고리즘**을 통해 초당 허용량(TPS)을 제어합니다.
     * **Effect:** 허용량을 초과하는 요청은 `429 Too Many Requests`로 조기에 거절하여, 핵심 비즈니스 로직과 DB를 보호합니다.
-    * **증거자료** :
+* **증거자료** :
 <img width="612" height="667" alt="스크린샷 2025-12-18 오전 11 43 29" src="https://github.com/user-attachments/assets/af13ed7f-4cbe-413a-a102-9a2838b3588d" />
 
 
@@ -58,7 +58,7 @@
     * **Spring Actuator**로 애플리케이션의 메트릭(Metric)을 노출하고, **Prometheus**가 이를 수집합니다.
     * **Grafana Dashboard**를 구축하여 **'현재 대기 중인 신고 요청 수(RabbitMQ Depth)**'와 **'JVM 메모리 상태**'를 실시간으로 모니터링합니다.
     * **Effect:** 장애 발생 시 로그를 뒤지는 대신, 대시보드를 통해 즉각적인 원인 파악 및 대응이 가능해졌습니다.
-    * **증거자료** : 
+* **증거자료** : 
 <img width="918" height="840" alt="스크린샷 2025-12-17 오후 10 53 49" src="https://github.com/user-attachments/assets/3aa066b0-fce1-4369-97f1-f24ad20669da" />
 
 
