@@ -19,7 +19,7 @@
 
 ## 2. System Architecture (아키텍처)
 
-*(아키텍처 다이어그램 이미지를 여기에 삽입해주세요)*
+<img width="994" height="688" alt="스크린샷 2025-12-19 오전 11 41 11" src="https://github.com/user-attachments/assets/0776ed40-7ca2-4a09-9667-16a80088b44c" />
 
 1.  **Rate Limiter (Interceptor):** 비정상적인 트래픽 폭주 시, `HandlerInterceptor` 레벨에서 요청을 조기에 차단하여 서버 리소스를 보호합니다.
 2.  **Caching (Redis):** 읽기 성능 최적화를 위한 Look-aside Cache 전략을 적용하여 RDBMS 부하를 줄입니다.
