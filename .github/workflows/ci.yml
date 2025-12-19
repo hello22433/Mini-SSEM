@@ -51,3 +51,5 @@ jobs:
       # 빌드 및 테스트 실행 (여기서 JUnit 테스트가 다 통과해야 초록불 뜸)
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          SPRING_PROFILES_ACTIVE: test
